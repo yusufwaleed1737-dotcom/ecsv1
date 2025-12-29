@@ -11,7 +11,10 @@ COPY . .
 RUN yarn build
 FROM nginx:stable-alpine
 COPY --from=builder /app/build /usr/share/nginx/html
+<<<<<<< HEAD
 RUN echo '{"status": "ok"}' > /usr/share/nginx/html/health.json
+=======
+>>>>>>> 7757b8c (Add Multi-stage Dockerfile)
 
 EXPOSE 80 
 
