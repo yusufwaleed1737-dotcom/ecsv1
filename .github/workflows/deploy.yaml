@@ -1,0 +1,145 @@
+name: Build Infrastructure and Deploy to AWS ECS
+
+on:
+  workflow_dispatch:
+
+permissions:
+  id-token: write
+  contents: read
+
+env:
+  AWS_REGION: eu-west-2
+  ECR_REPOSITORY: threat-modelling-app
+
+jobs:
+  build-infra:
+    runs-on: ubuntu-latest
+    environment: production
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Configure AWS credentials via OIDC
+        uses: aws-actions/configure-aws-credentials@v2
+        with:
+          role-to-assume: arn:aws:iam::261916864692:role/githubiamrole
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Set up Terraform
+        uses: hashicorp/setup-terraform@v2
+        with: 
+          terraform_version: 1.13.4
+
+      - name: Terraform Init
+        run: terraform init
+        working-directory: ./infrastructure
+
+      - name: Terraform Plan
+        run: terraform plan -out=tfplan -input=false 
+        working-directory: ./infrastructure
+
+      - name: Terraform Apply
+        run: terraform apply -input=false -auto-approve tfplan
+        working-directory: ./infrastructure
+
+
+  deploy-ecs:
+        needs: build-infra
+        runs-on: ubuntu-latest
+
+        steps:
+
+            - name: Checkout code
+              uses: actions/checkout@v3
+
+            - name: Configure AWS credentials via OIDC
+              uses: aws-actions/configure-aws-credentials@v2
+              with:
+                role-to-assume: arn:aws:iam::261916864692:role/githubiamrole
+                aws-region: ${{ env.AWS_REGION }}
+
+            - name: Install jq
+              run: sudo apt-get update && sudo apt-get install -y jq
+
+            - name: Get latest image from ECR
+              id: ecr-image
+              run: |
+                LATEST_IMAGE=$(aws ecr describe-images --repository-name ${{ env.ECR_REPOSITORY }} --query 'sort_by(imageDetails,& imagePushedAt)[-1]' --output json)
+                
+                LATEST_TAG=$(echo $LATEST_IMAGE | jq -r '.imageTags[0] // .imageDigest')
+
+                IMAGE_URI="261916864692.dkr.ecr.eu-west-2.amazonaws.com/${{ env.ECR_REPOSITORY }}:$LATEST_TAG"
+          
+                echo "LATEST_TAG=$LATEST_TAG" >> $GITHUB_ENV
+                echo "IMAGE_URI=$IMAGE_URI" >> $GITHUB_ENV
+                echo "Latest image: $IMAGE_URI"
+
+            - name: Update ECS Task Definition
+              env:
+                CLUSTER_NAME: ECS-Cluster
+                SERVICE_NAME: ECS-Cluster-service
+                CONTAINER_NAME: threat-modelling-app-container
+                TASK_FAMILY: ECS-Cluster-task-def
+              run: |
+                aws ecs describe-task-definition --task-definition $TASK_FAMILY --query taskDefinition > taskdef.json
+
+                sed -i "s|\"image\":.*|\"image\": \"$IMAGE_URI\",|" taskdef.json
+
+                aws ecs register-task-definition --cli-input-json file://taskdef.json
+
+                echo "Updated task definition with: $IMAGE_URI"
+
+            - name: Update ECS Service
+              env:
+                CLUSTER_NAME: ECS-Cluster
+                SERVICE_NAME: ECS-Cluster-service
+                TASK_FAMILY: ECS-Cluster-task-def
+              run: |
+                aws ecs update-service --cluster $CLUSTER_NAME --service $SERVICE_NAME --task-definition $TASK_FAMILY --force-new-deployment
+                echo "ECS Service updated to use new task definition."
+
+
+  health-check: 
+        name: ECS Service Health Check
+        needs: deploy-ecs
+        runs-on: ubuntu-latest
+
+        steps: 
+            - name: Wait for deployment
+              run: sleep 60
+
+            - name: Verify ECS deployment
+              env: 
+                CLUSTER_NAME: ECS-Cluster
+                SERVICE_NAME: ECS-Cluster-service
+              run: |
+                MAX_RETRIES=6
+                for i in $(seq 1 $MAX_RETRIES); do
+                  STATUS=$(aws ecs describe-services --cluster $CLUSTER_NAME --services $SERVICE_NAME \
+                    --query "services[0].deployments[?status=='PRIMARY'].rolloutState" \
+                    --output text)
+
+                  if [ "$STATUS" = "COMPLETED" ]; then
+                    echo "Deployment completed successfully!"
+                    exit 0
+                  fi
+
+                  echo "Deployment status: $STATUS (attempt $i/$MAX_RETRIES)"
+                  sleep 10
+                done
+
+                echo "Deployment timed out after $MAX_RETRIES attempts"
+                exit 1
+
+            - name: Health check
+              run: |
+                HTTP_CODE=$(curl -s -o /dev/null -w "%{http_code}" https://ecs.yusufwaleed.co.uk/health.json)
+
+                if [ "$HTTP_CODE" -eq 200 ]; then
+                  echo "Health check passed with HTTP status code $HTTP_CODE"
+                  exit 0
+                else
+                  echo "Health check failed with HTTP status code $HTTP_CODE"
+                  exit 1
+                fi
