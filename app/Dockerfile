@@ -11,6 +11,7 @@ COPY . .
 RUN yarn build
 FROM nginx:stable-alpine
 COPY --from=builder /app/build /usr/share/nginx/html
+RUN echo '{"status": "ok"}' > /usr/share/nginx/html/health.json
 
 EXPOSE 80 
 
