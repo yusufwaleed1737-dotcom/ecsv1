@@ -14,7 +14,10 @@ env:
 jobs:
   build-infra:
     runs-on: ubuntu-latest
+<<<<<<< HEAD
     environment: production
+=======
+>>>>>>> 8a5b287 (Add deploy.yaml pipeline)
 
     steps:
       - name: Checkout code
@@ -36,7 +39,11 @@ jobs:
         working-directory: ./infrastructure
 
       - name: Terraform Plan
+<<<<<<< HEAD
         run: terraform plan -out=tfplan -input=false 
+=======
+        run: terraform plan -out=tfplan -input=false
+>>>>>>> 8a5b287 (Add deploy.yaml pipeline)
         working-directory: ./infrastructure
 
       - name: Terraform Apply
@@ -77,17 +84,14 @@ jobs:
 
             - name: Update ECS Task Definition
               env:
-                CLUSTER_NAME: ECS-Cluster
-                SERVICE_NAME: ECS-Cluster-service
+                CLUSTER_NAME: ECS-Cluster-v3
+                SERVICE_NAME: ECS-Cluster-service-v3
                 CONTAINER_NAME: threat-modelling-app-container
-                TASK_FAMILY: ECS-Cluster-task-def
+                TASK_FAMILY: ECS-Cluster-task-def-v3
               run: |
-                aws ecs describe-task-definition --task-definition $TASK_FAMILY --query taskDefinition > taskdef.json
-
-                sed -i "s|\"image\":.*|\"image\": \"$IMAGE_URI\",|" taskdef.json
-
-                aws ecs register-task-definition --cli-input-json file://taskdef.json
-
+                aws ecs describe-task-definition --task-definition $TASK_FAMILY --query taskDefinition | jq 'del(.taskDefinitionArn, .revision, .status, .requiresAttributes, .compatibilities, .registeredAt, .registeredBy, .deregisteredAt)' > taskdef.json
+                jq --arg IMAGE "$IMAGE_URI" '.containerDefinitions[0].image = $IMAGE' taskdef.json > updated-taskdef.json
+                aws ecs register-task-definition --cli-input-json file://updated-taskdef.json
                 echo "Updated task definition with: $IMAGE_URI"
 
             - name: Update ECS Service
