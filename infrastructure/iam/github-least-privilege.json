@@ -59,6 +59,8 @@
                 "iam:ListRoles",
                 "iam:ListAttachedRolePolicies",
                 "iam:PassRole"
+                "iam:PassRole",
+                "iam:ListRolePolicies"
             ],
             "Resource": "*"
         },
@@ -70,6 +72,7 @@
                 "logs:DeleteLogGroup",
                 "logs:DescribeLogGroups",
                 "logs:PutRetentionPolicy",
+                "logs:ListTagsForResource",
                 "cloudwatch:PutMetricAlarm",
                 "cloudwatch:DeleteAlarms"
             ],
@@ -82,6 +85,8 @@
                 "route53:ChangeResourceRecordSets",
                 "route53:ListResourceRecordSets",
                 "route53:GetHostedZone"
+                "route53:GetHostedZone",
+                "route53:ListTagsForResource"
             ],
             "Resource": "arn:aws:route53:::hostedzone/Z08705092G2F0P71HQF8K"
         },
@@ -129,7 +134,21 @@
                 "s3:GetBucketPolicy",
                 "s3:GetBucketLocation",
                 "s3:GetBucketLogging",
-                "s3:ListBucket"
+                "s3:ListBucket",
+                "s3:ListBucket",
+                "s3:GetBucketAcl",
+                "s3:GetBucketCORS",
+                "s3:GetBucketWebsite",
+                "s3:GetBucketVersioning",
+                "s3:GetAccelerateConfiguration"
+                "s3:GetBucketWebsite"
+                "s3:GetBucketCORS"
+                "s3:GetBucketAcl"
+                "s3:GetBucketAcl",
+                "s3:GetBucketCors"
+                "s3:GetAccelerateConfiguration",
+                "s3:Get*",
+                "s3:List*"
             ],
             "Resource": [
                 "arn:aws:s3:::app-logs-bucket-v3",
@@ -138,3 +157,4 @@
         }
     ]
 }
+
