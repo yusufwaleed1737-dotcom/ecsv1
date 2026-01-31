@@ -182,6 +182,9 @@ resource "aws_ecs_task_definition" "ecs_task" {
         {
             name = "threat-modelling-app-container"
             image = var.ecr_repository_url
+            essential = true
+
+            command = ["nginx", "-g", "daemon off;"]
             portMappings = [
                 {
                     containerPort = 80
@@ -189,6 +192,15 @@ resource "aws_ecs_task_definition" "ecs_task" {
                     protocol = "tcp"
                 }
             ]
+
+            healthcheck = {
+                command = ["CMD-SHELL", "curl -f http://localhost/health.json || exit 1"]
+                interval = 30
+                timeout = 5
+                retries = 3
+                startPeriod = 60
+            }
+
             logConfiguration = {
                 logDriver = "awslogs"
                 options = {

@@ -104,46 +104,53 @@ jobs:
                 echo "ECS Service updated to use new task definition."
 
 
-  health-check: 
-        name: ECS Service Health Check
-        needs: deploy-ecs
-        runs-on: ubuntu-latest
+  health-check:
+    needs: deploy-ecs
+    runs-on: ubuntu-latest
+    steps:
+      - name: Configure AWS credentials via OIDC
+        uses: aws-actions/configure-aws-credentials@v2
+        with:
+          role-to-assume: arn:aws:iam::261916864692:role/githubiamrole
+          aws-region: ${{ env.AWS_REGION }}
 
-        steps: 
-            - name: Wait for deployment
-              run: sleep 60
+      - name: Wait for deployment
+        run: sleep 60
 
-            - name: Verify ECS deployment
-              env: 
-                CLUSTER_NAME: ECS-Cluster
-                SERVICE_NAME: ECS-Cluster-service
-              run: |
-                MAX_RETRIES=6
-                for i in $(seq 1 $MAX_RETRIES); do
-                  STATUS=$(aws ecs describe-services --cluster $CLUSTER_NAME --services $SERVICE_NAME \
-                    --query "services[0].deployments[?status=='PRIMARY'].rolloutState" \
-                    --output text)
+      - name: Verify ECS deployment
+        env:
+          CLUSTER_NAME: ECS-Cluster-v3
+          SERVICE_NAME: ECS-Cluster-service-v3
+        run: |
+          MAX_RETRIES=18
+          for i in $(seq 1 $MAX_RETRIES); do
+            STATUS=$(aws ecs describe-services --cluster $CLUSTER_NAME --services $SERVICE_NAME \
+              --query "services[0].deployments[?status=='PRIMARY'].rolloutState" \
+              --output text)
 
-                  if [ "$STATUS" = "COMPLETED" ]; then
-                    echo "Deployment completed successfully!"
-                    exit 0
-                  fi
+            if [ "$STATUS" = "COMPLETED" ]; then
+              echo "Deployment completed successfully!"
+              exit 0
+            fi
 
-                  echo "Deployment status: $STATUS (attempt $i/$MAX_RETRIES)"
-                  sleep 10
-                done
+            echo "Deployment status: $STATUS (attempt $i/$MAX_RETRIES)"
+            sleep 10
+          done
 
-                echo "Deployment timed out after $MAX_RETRIES attempts"
-                exit 1
+          echo "Deployment timed out after $MAX_RETRIES attempts"
+          exit 1
 
-            - name: Health check
-              run: |
-                HTTP_CODE=$(curl -s -o /dev/null -w "%{http_code}" https://ecs.yusufwaleed.co.uk/health.json)
-
-                if [ "$HTTP_CODE" -eq 200 ]; then
-                  echo "Health check passed with HTTP status code $HTTP_CODE"
-                  exit 0
-                else
-                  echo "Health check failed with HTTP status code $HTTP_CODE"
-                  exit 1
-                fi
+      - name: Health check
+        run: |
+         echo "Checking if website is responding..."
+         for i in {1..12}; do
+          HTTP_CODE=$(curl -s -o /dev/null -w "%{http_code}" --max-time 5 https://ecs.yusufwaleed.co.uk/health.json)
+          if [ "$HTTP_CODE" -eq 200 ]; then
+            echo "✓ Website healthy (HTTP $HTTP_CODE)"
+            exit 0
+          fi
+          echo "Attempt $i/12: HTTP $HTTP_CODE, waiting 5s..."
+          sleep 5
+         done
+         echo "Website health check failed"
+         exit 1

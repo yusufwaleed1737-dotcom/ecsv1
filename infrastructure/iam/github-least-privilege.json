@@ -76,7 +76,7 @@
             "Resource": "*"
         },
         {
-            "Sid": "Route53Access",
+            "Sid": "Route53ZoneAccess",
             "Effect": "Allow",
             "Action": [
                 "route53:ChangeResourceRecordSets",
@@ -86,14 +86,55 @@
             "Resource": "arn:aws:route53:::hostedzone/Z08705092G2F0P71HQF8K"
         },
         {
+            "Sid": "Route53ListAccess",
+            "Effect": "Allow",
+            "Action": [
+                "route53:ListHostedZones",
+                "route53:GetChange"
+            ],
+            "Resource": "*"
+        },
+        {
             "Sid": "ACMAccess",
             "Effect": "Allow",
             "Action": [
                 "acm:RequestCertificate",
                 "acm:DescribeCertificate",
-                "acm:DeleteCertificate"
+                "acm:DeleteCertificate",
+                "acm:ListTagsForCertificate",
+                "acm:AddTagsToCertificate",
+                "acm:RemoveTagsFromCertificate"
             ],
             "Resource": "*"
+        },
+        {
+            "Sid": "ECRAccess",
+            "Effect": "Allow",
+            "Action": [
+                "ecr:DescribeImages",
+                "ecr:DescribeRepositories",
+                "ecr:GetAuthorizationToken"
+            ],
+            "Resource": "*"
+        },
+        {
+            "Sid": "S3LogsAccess",
+            "Effect": "Allow",
+            "Action": [
+                "s3:CreateBucket",
+                "s3:PutBucketPolicy",
+                "s3:PutBucketLifecycleConfiguration",
+                "s3:PutBucketPublicAccessBlock",
+                "s3:PutBucketLogging",
+                "s3:GetBucketPolicy",
+                "s3:GetBucketLocation",
+                "s3:GetBucketLogging",
+                "s3:ListBucket"
+            ],
+            "Resource": [
+                "arn:aws:s3:::app-logs-bucket-v3",
+                "arn:aws:s3:::app-logs-bucket-v3/*"
+            ]
         }
     ]
 }
