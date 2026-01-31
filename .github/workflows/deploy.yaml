@@ -96,9 +96,9 @@ jobs:
 
             - name: Update ECS Service
               env:
-                CLUSTER_NAME: ECS-Cluster
-                SERVICE_NAME: ECS-Cluster-service
-                TASK_FAMILY: ECS-Cluster-task-def
+                CLUSTER_NAME: ECS-Cluster-v3
+                SERVICE_NAME: ECS-Cluster-service-v3
+                TASK_FAMILY: ECS-Cluster-task-def-v3
               run: |
                 aws ecs update-service --cluster $CLUSTER_NAME --service $SERVICE_NAME --task-definition $TASK_FAMILY --force-new-deployment
                 echo "ECS Service updated to use new task definition."
