@@ -1,4 +1,3 @@
-
 module "network" {
     source = "./modules/network"
 
@@ -18,12 +17,10 @@ module "network" {
     private2_cidr = var.private2_cidr   
 }
 
-
 module "security" {
     source = "./modules/security"
     vpc_id = module.network.vpc_id
 }
-
 
 module "acm" {
     source = "./modules/acm"
@@ -49,7 +46,6 @@ module "alb" {
     route_53_zone_id = module.acm.route_53_zone_id
     deployment_id = var.deployment_id
 }
-
 
 module "ecs" {
     source = "./modules/ecs"
