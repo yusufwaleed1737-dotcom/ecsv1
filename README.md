@@ -53,6 +53,10 @@ The system is designed with:
 - Automated container builds and deployments
 - Secure OIDC authentication from GitHub to AWS
 
+## Architecture Diagram:
+
+![Threat Model - Architecture Diagram](https://github.com/user-attachments/assets/4f2338cb-c52e-4666-9b03-c4e43fefbf86)
+
 ## Architecture Summary:
 
 The application runs as a **containerised workload on ECS Fargate**, behind an **Application Load Balancer** inside a custom VPC spanning two **Availability Zones** for fault tolerance.
