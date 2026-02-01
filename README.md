@@ -143,19 +143,20 @@ Then visit `http://localhost:3000`
 
 ## Domain Dashboard:
 
-(INSERT IMAGE)
+![Domain Dashboard](https://github.com/user-attachments/assets/a5ea64e9-f45b-40c3-b271-00ce49985d12)
 
 ## Security Certificate:
 
-(Insert here)
+![Security certificate](https://github.com/user-attachments/assets/4cbdaebf-870c-432d-9dc7-8bbb2aea1060)
 
 ## Build Pipeline:
 
-(Insert here)
+![Push pipeline complete](https://github.com/user-attachments/assets/45b89ac2-c3c1-4beb-8082-9a5415668827)
 
 ## Deploy Pipeline:
 
-(Insert here)
+![Complete build pipeline](https://github.com/user-attachments/assets/892d54e2-bb0d-4963-838b-f04b161b6f51)
+
 
 
 
