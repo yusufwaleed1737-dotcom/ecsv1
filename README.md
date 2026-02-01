@@ -10,7 +10,7 @@
 ECS-Threat-Composer-App/
 │
 ├── app/                         
-│   ├── Dockerfile
+│   └── Dockerfile
 │
 │
 ├── infrastructure/              
