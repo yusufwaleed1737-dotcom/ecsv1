@@ -14,11 +14,7 @@ env:
 jobs:
   build-infra:
     runs-on: ubuntu-latest
-<<<<<<< HEAD
     environment: production
-=======
->>>>>>> 8a5b287 (Add deploy.yaml pipeline)
-
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
@@ -39,11 +35,7 @@ jobs:
         working-directory: ./infrastructure
 
       - name: Terraform Plan
-<<<<<<< HEAD
         run: terraform plan -out=tfplan -input=false 
-=======
-        run: terraform plan -out=tfplan -input=false
->>>>>>> 8a5b287 (Add deploy.yaml pipeline)
         working-directory: ./infrastructure
 
       - name: Terraform Apply

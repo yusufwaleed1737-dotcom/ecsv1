@@ -58,14 +58,8 @@
                 "iam:GetRole",
                 "iam:ListRoles",
                 "iam:ListAttachedRolePolicies",
-<<<<<<< HEAD
-                "iam:PassRole"
                 "iam:PassRole",
                 "iam:ListRolePolicies"
-=======
-                "iam:PassRole",
-                "iam:ListRolePolicies"  
->>>>>>> ca8ce79 (Remove guthub-permissions)
             ],
             "Resource": "*"
         },
@@ -77,11 +71,7 @@
                 "logs:DeleteLogGroup",
                 "logs:DescribeLogGroups",
                 "logs:PutRetentionPolicy",
-<<<<<<< HEAD
-                "logs:ListTagsForResource",
-=======
                 "logs:ListTagsForResource",  
->>>>>>> ca8ce79 (Remove guthub-permissions)
                 "cloudwatch:PutMetricAlarm",
                 "cloudwatch:DeleteAlarms"
             ],
@@ -93,8 +83,6 @@
             "Action": [
                 "route53:ChangeResourceRecordSets",
                 "route53:ListResourceRecordSets",
-<<<<<<< HEAD
-                "route53:GetHostedZone"
                 "route53:GetHostedZone",
                 "route53:ListTagsForResource"
             ],
@@ -104,9 +92,6 @@
             "Sid": "Route53ListAccess",
             "Effect": "Allow",
             "Action": [
-=======
-                "route53:GetHostedZone",
->>>>>>> ca8ce79 (Remove guthub-permissions)
                 "route53:ListHostedZones",
                 "route53:ListTagsForResource",
                 "route53:GetChange"
@@ -149,24 +134,20 @@
                 "s3:GetBucketLocation",
                 "s3:GetBucketLogging",
                 "s3:ListBucket",
-<<<<<<< HEAD
-                "s3:ListBucket",
                 "s3:GetBucketAcl",
                 "s3:GetBucketCORS",
                 "s3:GetBucketWebsite",
                 "s3:GetBucketVersioning",
-                "s3:GetAccelerateConfiguration"
-                "s3:GetBucketWebsite"
-                "s3:GetBucketCORS"
-                "s3:GetBucketAcl"
-                "s3:GetBucketAcl",
-                "s3:GetBucketCors"
                 "s3:GetAccelerateConfiguration",
+                "s3:GetBucketWebsite",
+                "s3:GetBucketCORS",
+                "s3:GetBucketAcl",
+                "s3:GetBucketAcl",
+                "s3:GetBucketCors",
                 "s3:Get*",
-                "s3:List*"
-=======
+                "s3:List*",
                 "s3:GetBucketAcl"  
->>>>>>> ca8ce79 (Remove guthub-permissions)
+
             ],
             "Resource": [
                 "arn:aws:s3:::app-logs-bucket-v3",
