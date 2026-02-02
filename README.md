@@ -1,5 +1,17 @@
 # AWS ECS Fargate Deployment - Threat Modelling Application
 
+## Project Overview:
+
+This project deploys AWS' Threat Modelling web application onto AWS infrastructure (production style) using **Terraform and GitHub Actions CI/CD**.
+
+The system is designed with:
+
+- High Availability (Multi AZ)
+- Private networking for workloads
+- Infrastructure as Code (IaC)
+- Automated container builds and deployments
+- Secure OIDC authentication from GitHub to AWS
+
 ## Live Demo:
 
 https://github.com/user-attachments/assets/646370b5-fe71-4c32-8b36-a3108b49458a
@@ -41,18 +53,6 @@ ECS-Threat-Composer-App/
 └── README.md
 ```
 
-## Project Overview:
-
-This project deploys AWS' Threat Modelling web application onto AWS infrastructure (production style) using **Terraform and GitHub Actions CI/CD**.
-
-The system is designed with:
-
-- High Availability (Multi AZ)
-- Private networking for workloads
-- Infrastructure as Code (IaC)
-- Automated container builds and deployments
-- Secure OIDC authentication from GitHub to AWS
-
 ## Architecture Diagram:
 
 ![Threat Model - Architecture Diagram](https://github.com/user-attachments/assets/4f2338cb-c52e-4666-9b03-c4e43fefbf86)
@@ -66,6 +66,14 @@ Traffic flow:
 User → Route53 → ALB (HTTPS) → ECS Fargate Tasks → App
 ```
 *Infrastructure provisioning and application deployment are fully automated through GitHub Actions CI/CD workflows.*
+
+## Engineering Impact:
+
+- 118MB production container image (industry grade lightweight build)
+- ~80% faster container pull & deployment vs typical Python images
+- Zero `public` compute exposure (private ECS tasks)
+- Full environment deployable in ~15 minutes
+- ClickOps deployment takes ~2 hours (~85% faster with Terraform and CI/CD and repeatable)
 
 ## Infrastructure Components:
 
@@ -160,15 +168,3 @@ Then visit `http://localhost:3000`
 ## Deploy Pipeline:
 
 ![Complete build pipeline](https://github.com/user-attachments/assets/892d54e2-bb0d-4963-838b-f04b161b6f51)
-
-
-## Engineering Impact:
-
-- 118MB production container image (industry grade lightweight build)
-- ~80% faster container pull & deployment vs typical Python images
-- Zero `public` compute exposure (private ECS tasks)
-- Full environment deployable in ~15 minutes
-- ClickOps deployment takes ~2 hours (~85% faster with Terraform and CI/CD and repeatable)
-
-
-
